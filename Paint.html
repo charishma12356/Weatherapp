@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Paint App</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #ffecd2, #fcb69f);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+        }
+        button, input {
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button {
+            background: #ff6f61;
+            color: white;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #d9534f;
+        }
+        canvas {
+            background: white;
+            border: 3px solid black;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Creative Paint App</h1>
+    <div class="toolbar">
+        <input type="color" id="colorPicker">
+        <input type="range" id="sizePicker" min="2" max="20" value="5">
+        <button onclick="toggleEraser()">Eraser</button>
+        <button onclick="clearCanvas()">Clear</button>
+        <button onclick="saveCanvas()">Save</button>
+    </div>
+    <canvas id="canvas" width="800" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        let painting = false;
+        let erasing = false;
+        let brushColor = "#000000";
+        let brushSize = 5;
+
+        document.getElementById("colorPicker").addEventListener("change", (e) => {
+            brushColor = e.target.value;
+            erasing = false;
+        });
+
+        document.getElementById("sizePicker").addEventListener("input", (e) => {
+            brushSize = e.target.value;
+        });
+
+        canvas.addEventListener("mousedown", () => painting = true);
+        canvas.addEventListener("mouseup", () => {
+            painting = false;
+            ctx.beginPath();
+        });
+        canvas.addEventListener("mousemove", draw);
+
+        function draw(e) {
+            if (!painting) return;
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = erasing ? "#FFFFFF" : brushColor;
+
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        }
+
+        function toggleEraser() {
+            erasing = !erasing;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveCanvas() {
+            const link = document.createElement("a");
+            link.download = "my_painting.png";
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
